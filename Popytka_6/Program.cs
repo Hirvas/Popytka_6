@@ -17,8 +17,8 @@ namespace GrayScottModel
 	{
 		private int gridSize = 100;
 		private double[,] A, B;
-		private double feedRate = 0.035;
-		private double killRate = 0.058;
+		private double feedRate = 0.029;
+		private double killRate = 0.057;
 		private double diffusionA = 1.0;
 		private double diffusionB = 0.5;
 		private double dt = 1.0;
@@ -36,11 +36,11 @@ namespace GrayScottModel
 				for (int j = 0; j < gridSize; j++)
 				{
 					A[i, j] = 1.0; // Начальная концентрация A
-					B[i, j] = 0.0; // Начальная концентрация B
+					B[i, j] = 0.5; // Начальная концентрация B
 
 					if (Random.Next(0, 100)  < 5)
 					{
-						A[i, j] = 0.0; // Начальная концентрация A
+						A[i, j] = 0.5; // Начальная концентрация A
 						B[i, j] = 1.0; // Начальная концентрация B
 					}
 				}
@@ -50,7 +50,7 @@ namespace GrayScottModel
 
 			///*
 			Timer timer = new Timer();
-			timer.Interval = 10; // Обновление каждые 1000 мс
+			timer.Interval = 1000; // Обновление каждые 1000 мс
 			timer.Tick += Timer_Tick;
 			timer.Start();
 			//*/
@@ -71,17 +71,18 @@ namespace GrayScottModel
 			{
 				for (int j = 0; j < gridSize; j++)
 				{
-					newA[i, j] =(diffusionA * Serkle(i, j, A) - A[i, j] * B[i, j] * B[i, j] + feedRate * (1 - A[i, j])) * dt;
-					newB[i, j] =(diffusionB * Serkle(i, j, B) + A[i, j] * B[i, j] * B[i, j] - (killRate + feedRate) * B[i, j]) * dt;
+					newA[i, j] =(Serkle(i, j, A, diffusionA) - A[i, j] * B[i, j] * B[i, j] + feedRate * (1 - A[i, j])) * dt;
+					newB[i, j] =(Serkle(i, j, B, diffusionB) + A[i, j] * B[i, j] * B[i, j] - (killRate + feedRate) * B[i, j]) * dt;
 				}
 			}
-			A = Sigmoid(newA);
-			B = Sigmoid(newB);
-		}
+			A = newA;
+			B = newB;
 
-		private double Serkle(int x, int y, double[,] AB)
+        }
+
+		private double Serkle(int x, int y, double[,] AB, double diffusion)
 		{
-			double mas = -8*AB[x,y];
+			double mas = AB[x,y];
 
             for (int i = -1; i < 2; i++)
 			{
@@ -92,12 +93,12 @@ namespace GrayScottModel
 					if (i != 0 & j != 0)
 					{ mas += AB[a, b] * 0.05; }
 					else if (i == 0 & j == 0)
-					{ mas += AB[a, b]; }
+					{ mas += -AB[a, b]; }
 					else
 					{ mas += AB[a, b] * 0.2; }			
                 }
 			}
-			return (mas);			
+			return (mas * diffusion);			
 		}
 
 		private int SwitchXY(int XY, int IJ)
@@ -112,32 +113,31 @@ namespace GrayScottModel
         }
 
 
-		private double[,] Sigmoid(double[,] Mass)
+		/*
+		private double ColorBlock(double Color)
 		{
-			// Преобразование двумерного массива в одномерный
-			var flattened = Mass.Cast<double>().ToArray();
-
-			// Применение функции сигмоиды ко всем элементам массива
-			var sigmoids = flattened.Select(x => 1.0 / (1.0 + Math.Exp(-x))).ToArray();
-
-			// Преобразование обратно в двумерный массив
-			double[,] result = new double[Mass.GetLength(0), Mass.GetLength(1)];
-			Buffer.BlockCopy(sigmoids, 0, result, 0, sigmoids.Length * sizeof(double));
-			return (result);
+			if (Color < 0) { Color = 0; return (Color); }
+			if (Color * 255 > 255) { Color = 255; return (Color); }
+			return (Color*225);
 		}
-
+		//*/
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			//double[,] RisA = Sigmoid(A);
-            //double[,] RisB = Sigmoid(B);
+			/*
+			double[,] RisA = Sigmoid(A);
+            double[,] RisB = Sigmoid(B);
+			//*/
             base.OnPaint(e);
             for (int i = 0; i < gridSize; i++)
 			{
 				for (int j = 0; j < gridSize; j++)
 				{
-					Color color = Color.FromArgb((int)(A[i,j] * 255), (int)(B[i, j] * 255), 0);
-					using (Brush brush = new SolidBrush(color))
+					//int ColorF = (int)(A[i, j] * B[i, j]/2*255);
+                    //Color color = Color.FromArgb((int)RisA[i,j], (int)RisB[i, j], 0);
+                    Color color = Color.FromArgb((int)(A[i, j] * 255), (int)(B[i, j] * 255), 255);
+                    //Color color = Color.FromArgb(ColorF, ColorF, ColorF);
+                    using (Brush brush = new SolidBrush(color))
 					{
 						e.Graphics.FillRectangle(brush, i * 5, j * 5, 5, 5); // Масштабирование для наглядности
 					}
