@@ -11,7 +11,7 @@ namespace GrayScottModel
 		static void Main()
 		{
 			Application.Run(new Form1());
-			//22
+			//33
 		}
 	}
 	public partial class Form1 : Form
