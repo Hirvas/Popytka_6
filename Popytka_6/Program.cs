@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
-
+using System.Drawing.Text;
 
 namespace GrayScottModel
 {
@@ -28,6 +28,8 @@ namespace GrayScottModel
 			A = new double[gridSize, gridSize];
 			B = new double[gridSize, gridSize];
 
+			Random Random = new Random();
+
 			// Инициализация
 			for (int i = 0; i < gridSize; i++)
 			{
@@ -36,7 +38,7 @@ namespace GrayScottModel
 					A[i, j] = 1.0; // Начальная концентрация A
 					B[i, j] = 0.0; // Начальная концентрация B
 
-					if (new Random().Next(0, 100) < 20)
+					if (Random.Next(0, 100)  < 5)
 					{
 						A[i, j] = 0.0; // Начальная концентрация A
 						B[i, j] = 1.0; // Начальная концентрация B
@@ -46,11 +48,12 @@ namespace GrayScottModel
 
 			// Создание начального паттерна
 
-
+			///*
 			Timer timer = new Timer();
 			timer.Interval = 1000; // Обновление каждые 1000 мс
 			timer.Tick += Timer_Tick;
 			timer.Start();
+			//*/
 		}
 
 		private void Timer_Tick(object sender, EventArgs e)
@@ -64,9 +67,9 @@ namespace GrayScottModel
 			double[,] newA = new double[gridSize, gridSize];
 			double[,] newB = new double[gridSize, gridSize];
 
-			for (int i = 1; i < gridSize - 1; i++)
+			for (int i = 0; i < gridSize; i++)
 			{
-				for (int j = 1; j < gridSize - 1; j++)
+				for (int j = 0; j < gridSize; j++)
 				{
 					double laplacianA = A[i - 1, j] + A[i + 1, j] + A[i, j - 1] + A[i, j + 1] - 4 * A[i, j];
 					double laplacianB = B[i - 1, j] + B[i + 1, j] + B[i, j - 1] + B[i, j + 1] - 4 * B[i, j];
@@ -75,16 +78,38 @@ namespace GrayScottModel
 					newB[i, j] = B[i, j] + (diffusionB * laplacianB + A[i, j] * B[i, j] * B[i, j] - (killRate + feedRate) * B[i, j]) * dt;
 				}
 			}
-
-
-
-			A = TtOtT(newA);
-			B = TtOtT(newB);
+			A = Sigmoid(newA);
+			B = Sigmoid(newB);
 		}
 
+		private void Serkle(int x, int y)
+		{
+			double[,] mas;
 
+            for (int i = -1; i <= 1; i++)
+			{
 
-		private double[,] TtOtT(double[,] Mass)
+                switch (x + i)
+                {
+                    case < 0:
+                        x = gridSize;
+                        break;
+                    case > gridSize:
+                        x = 0;
+                        break;
+                    default:
+                        break;
+                }
+
+                for (int j = -1; j <= 1; j++)
+				{
+
+				}
+			}
+			
+		}
+
+		private double[,] Sigmoid(double[,] Mass)
 		{
 			// Преобразование двумерного массива в одномерный
 			var flattened = Mass.Cast<double>().ToArray();
@@ -101,8 +126,8 @@ namespace GrayScottModel
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
-			base.OnPaint(e);
-			for (int i = 0; i < gridSize; i++)
+            base.OnPaint(e);
+            for (int i = 0; i < gridSize; i++)
 			{
 				for (int j = 0; j < gridSize; j++)
 				{
