@@ -82,32 +82,51 @@ namespace GrayScottModel
 			B = Sigmoid(newB);
 		}
 
-		private void Serkle(int x, int y)
+		private double[,] Serkle(int x, int y, double[,] masA, double[,] masB)
 		{
 			double[,] mas;
 
             for (int i = -1; i <= 1; i++)
 			{
-
-                switch (x + i)
-                {
-                    case < 0:
-                        x = gridSize;
-                        break;
-                    case > gridSize:
-                        x = 0;
-                        break;
-                    default:
-                        break;
-                }
+				x = SwitchXY;
 
                 for (int j = -1; j <= 1; j++)
 				{
 
-				}
+                    switch (y + i)
+                    {
+                        case < 0:
+                            y = gridSize;
+                            break;
+                        case > gridSize:
+                            y = 0;
+                            break;
+                        default:
+                            break;
+                    }
+
+					mas = A[]
+
+                }
 			}
 			
 		}
+
+		private int SwitchXY(int XY, int IJ)
+		{
+            switch (XY + IJ)
+            {
+                case < 0:
+                    XY = gridSize;
+                    break;
+                case > gridSize:
+                    XY = 0;
+                    break;
+                default:
+                    break;
+            }
+        }
+
 
 		private double[,] Sigmoid(double[,] Mass)
 		{
