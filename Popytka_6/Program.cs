@@ -23,6 +23,7 @@ namespace GrayScottModel
 		private double diffusionB = 0.5;
 		private double dt = 1.0;
 
+
 		public Form1()
 		{
 			A = new double[gridSize, gridSize];
